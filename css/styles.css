@@ -36,13 +36,23 @@
     
     /* Fuente y Transiciones */
     --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-    --transition: all 0.2s ease-in-out;
+    --transition-btn: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out, transform 0.15s ease-out;
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    /* Evita el destello/tap delay grisáceo por defecto en navegadores móviles Android */
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    /* Previene scroll horizontal accidental que confunda el eje de desplazamiento */
+    overflow-x: hidden;
+    /* Informa al compositor que el paneo vertical tiene prioridad inmediata */
+    touch-action: pan-y;
+    -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -50,9 +60,12 @@ body {
     color: var(--text-primary);
     font-family: var(--font-sans);
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     justify-content: center;
     padding: var(--space-lg) var(--space-md);
+    overflow-x: hidden;
+    touch-action: pan-y;
 }
 
 /* ==========================================================================
@@ -140,8 +153,11 @@ body {
     font-weight: 600;
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: var(--transition);
+    transition: var(--transition-btn);
     text-align: center;
+    touch-action: pan-y;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .role-btn:hover {
@@ -155,6 +171,10 @@ body {
     color: var(--accent-turquoise);
 }
 
+.role-btn:active {
+    transform: scale(0.98);
+}
+
 .btn-primary {
     background-color: var(--accent-gold);
     color: #0b131e;
@@ -164,13 +184,23 @@ body {
     font-weight: 700;
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: var(--transition);
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.15s ease-out;
     text-transform: uppercase;
     letter-spacing: 1px;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .btn-primary:hover {
     background-color: var(--accent-gold-hover);
+    box-shadow: 0 0 14px rgba(245, 158, 11, 0.35);
+}
+
+.btn-primary:active {
+    background-color: var(--accent-gold-hover);
+    transform: scale(0.97);
+    box-shadow: 0 0 18px rgba(245, 158, 11, 0.45);
 }
 
 /* ==========================================================================
@@ -214,16 +244,24 @@ body {
     font-weight: 600;
     cursor: pointer;
     text-align: left;
-    transition: var(--transition);
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.15s ease-out;
     display: flex;
     align-items: center;
     gap: 0.85rem;
     box-shadow: var(--shadow-card);
+    touch-action: pan-y;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .draft-card:hover {
     background-color: var(--bg-card-hover);
     border-color: var(--accent-turquoise);
+}
+
+.draft-card:active {
+    transform: scale(0.985);
+    background-color: var(--bg-card-hover);
 }
 
 .draft-card.has-champion {
@@ -239,12 +277,14 @@ body {
     background-color: var(--bg-dark);
     border: 1px solid var(--border-color);
     flex-shrink: 0;
+    pointer-events: none;
 }
 
 .card-info {
     display: flex;
     flex-direction: column;
     gap: var(--space-xs);
+    pointer-events: none;
 }
 
 .card-champ-name {
@@ -278,6 +318,8 @@ body {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease-in-out;
+    overscroll-behavior: contain;
+    will-change: opacity;
 }
 
 .modal-overlay.is-open {
@@ -292,12 +334,15 @@ body {
     width: 100%;
     max-width: 460px;
     max-height: 80vh;
+    max-height: 80dvh;
     display: flex;
     flex-direction: column;
     box-shadow: var(--shadow-modal);
     overflow: hidden;
     transform: scale(0.95);
     transition: transform 0.2s ease-in-out;
+    will-change: transform;
+    overscroll-behavior: contain;
 }
 
 .modal-overlay.is-open .modal-content {
@@ -315,6 +360,8 @@ body {
 .modal-title {
     font-size: 1.25rem;
     color: var(--text-primary);
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .modal-close {
@@ -324,10 +371,17 @@ body {
     font-size: 1.75rem;
     cursor: pointer;
     line-height: 1;
-    transition: var(--transition);
+    transition: color 0.2s ease-in-out, transform 0.15s ease-out;
+    touch-action: manipulation;
+    padding: var(--space-xs);
 }
 
 .modal-close:hover {
+    color: var(--text-primary);
+}
+
+.modal-close:active {
+    transform: scale(0.9);
     color: var(--text-primary);
 }
 
@@ -337,6 +391,7 @@ body {
     flex-direction: column;
     gap: var(--space-md);
     overflow: hidden;
+    overscroll-behavior: contain;
 }
 
 .search-input {
@@ -348,41 +403,11 @@ body {
     color: var(--text-primary);
     font-size: 0.95rem;
     outline: none;
-    transition: var(--transition);
+    transition: border-color 0.2s ease-in-out;
+    touch-action: manipulation;
 }
 
 .search-input:focus {
-    border-color: var(--accent-turquoise);
-}
-
-/* Contenedor de Filtros Inteligentes (Fase 4) */
-.filters-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-xs);
-}
-
-.filter-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.filter-select {
-    width: 100%;
-    background-color: var(--bg-dark);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    padding: 0.5rem 0.6rem;
-    color: var(--text-primary);
-    font-size: 0.85rem;
-    font-weight: 500;
-    outline: none;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.filter-select:focus,
-.filter-select:hover {
     border-color: var(--accent-turquoise);
 }
 
@@ -391,8 +416,12 @@ body {
     flex-direction: column;
     gap: var(--space-sm);
     overflow-y: auto;
-    max-height: 45vh;
+    max-height: 50vh;
+    max-height: 50dvh;
     padding-right: var(--space-xs);
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y;
 }
 
 .champion-item {
@@ -405,10 +434,13 @@ body {
     font-weight: 600;
     text-align: left;
     cursor: pointer;
-    transition: var(--transition);
+    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, opacity 0.15s ease-in-out, transform 0.12s ease-out;
     display: flex;
     align-items: center;
     gap: 0.85rem;
+    touch-action: pan-y;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .champion-item:hover:not(:disabled) {
@@ -416,11 +448,18 @@ body {
     border-color: var(--accent-turquoise);
 }
 
+.champion-item:active:not(:disabled) {
+    background-color: var(--bg-card-hover);
+    border-color: var(--accent-turquoise);
+    transform: scale(0.99);
+}
+
 .champion-item:disabled {
     opacity: 0.4;
     cursor: not-allowed;
     border-color: transparent;
     color: var(--text-disabled);
+    pointer-events: none;
 }
 
 .modal-portrait {
@@ -431,6 +470,7 @@ body {
     background-color: var(--bg-dark);
     border: 1px solid var(--border-color);
     flex-shrink: 0;
+    pointer-events: none;
 }
 
 .no-results {
@@ -443,13 +483,6 @@ body {
 /* ==========================================================================
    Diseño Responsive
    ========================================================================== */
-@media (max-width: 480px) {
-    .filters-container {
-        grid-template-columns: 1fr;
-        gap: var(--space-xs);
-    }
-}
-
 @media (min-width: 600px) {
     .cards-grid {
         grid-template-columns: repeat(2, 1fr);
